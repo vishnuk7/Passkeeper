@@ -1,9 +1,15 @@
 package parameter;
 
 public class Options {
-    String flag, opt;
-    Options(String flag, String opt){
+    public String flag;
+	public String value;
+
+    Options(String flag){
+        this.flag = flag; 
+    }
+
+    Options(String flag, String value){
         this.flag = flag;
-        this.opt = opt;
+        this.value = value;
     }
 }
