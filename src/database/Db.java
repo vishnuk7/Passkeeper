@@ -7,10 +7,17 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Db {
 
     public static void connection() {  
       
+        // set log priority from INFO to SEVERE
+        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        mongoLogger.setLevel(Level.SEVERE);
+
         Dotenv dotenv = Dotenv.load();
         String DB_USER = dotenv.get("DB_USER");
         String DB_PASSWORD = dotenv.get("DB_PASSWORD");
