@@ -5,11 +5,12 @@ import parameter.ParserArgs;
 
 public class App {
     private static void parameter(Options op) {
-        switch (op.flag) {
-            case "-h":
-                System.out.println("call the help method");
-                break;
-        }
+        System.out.println(op.flag+" "+op.value);
+        // switch (op.flag) {
+        //     case "-h":
+        //         System.out.println("call the help method");
+        //         break;
+        // }
 
     }
 
