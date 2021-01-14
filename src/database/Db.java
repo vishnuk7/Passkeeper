@@ -8,8 +8,17 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Db {
-    public static void main(String[] args) {  
+
+    public static void connection() {  
+      
+        // set log priority from INFO to SEVERE
+        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        mongoLogger.setLevel(Level.SEVERE);
+
         // fetching data from dotenv
         Dotenv dotenv = Dotenv.load();
         String DB_USER = dotenv.get("DB_USER");
