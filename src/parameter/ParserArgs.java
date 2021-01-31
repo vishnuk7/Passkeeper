@@ -8,7 +8,7 @@ public class ParserArgs {
     List<String> argsList = new ArrayList<String>();
 
     public ParserArgs(String[] args){
-
+        List<Integer> indexTracker = new ArrayList<Integer>();
         for (int i = 0; i < args.length; i++){
             
             switch (args[i].charAt(0)) {
@@ -16,14 +16,18 @@ public class ParserArgs {
                     if(args[i].length() == 1 || args[i].length() > 2)
                         this.errorMessage(args[i]);
                     else {
-                        if(args.length-1 != i) 
+                        if(args.length-1 != i) {
                             this.optList.add(new Options(args[i], args[i+1]));
+                            indexTracker.add(i+1);
+                        }
                         else
                             this.optList.add(new Options(args[i]));
                     }
                     break;
                 default: 
-                    argsList.add(args[i]);
+                        if(!indexTracker.contains(i)){
+                            argsList.add(args[i]);
+                        }
                     break;
             }
         }
