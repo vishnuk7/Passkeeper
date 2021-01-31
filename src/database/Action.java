@@ -9,7 +9,7 @@ public class Action extends Connection {
         super();
     }
 
-    public void insertData(String username,String password){
+    public void createUser(String username,String password){
         // query to be inserted
         Document query = new Document("_id", new ObjectId());
         query.append("user_name", username)
