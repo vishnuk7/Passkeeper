@@ -42,7 +42,7 @@ public class ListOfCommands {
             System.out.println("Please enter password!!");
             return;
         } else {
-            new Action().insertData(tmpOptions[0].value, tmpOptions[1].value);
+            new Action().createUser(tmpOptions[0].value, tmpOptions[1].value);
         }
     }
 }
