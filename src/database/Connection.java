@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class Connection {
 
     protected MongoCollection<Document> collection;
-    private MongoClient mongoClient;
+    protected MongoClient mongoClient;
 
     Connection() {  
       

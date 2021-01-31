@@ -1,5 +1,4 @@
 import java.util.List;
-
 import parameter.ListOfCommands;
 import parameter.Options;
 import parameter.ParserArgs;

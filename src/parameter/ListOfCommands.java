@@ -16,6 +16,7 @@ public class ListOfCommands {
         invokeOperation = new HashMap<String, Runnable>();
         invokeOperation.put("create", () -> createUser());
         invokeOperation.put("add", () -> addNewItem());
+        invokeOperation.put("list", () -> list());
     }
 
     public void check(List<String> args, List<Options> optList) {
@@ -78,6 +79,21 @@ public class ListOfCommands {
         }
          else {
             new Action().addNewItem(tmpOptions[0].value, tmpOptions[1].value, tmpOptions[2].value);
+        }
+    }
+
+    public void list() {
+        Options[] tmpOptions = { null };
+        for (Options op : this.optList) {
+            if (op.flag.equals("-an") && op.value != null)
+                tmpOptions[0] = op;
+        }
+
+        if (tmpOptions[0] == null) {
+            System.out.println("Account name is missing!!");
+            return;
+        } else {
+            new Action().view(tmpOptions[0].value);
         }
     }
 }
