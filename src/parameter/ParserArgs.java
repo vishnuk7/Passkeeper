@@ -13,12 +13,18 @@ public class ParserArgs {
             
             switch (args[i].charAt(0)) {
                 case '-': 
-                    if(args[i].length() == 1 || args[i].length() > 2)
+                    if(args[i].length() == 1 || args[i].length() > 3)
                         this.errorMessage(args[i]);
                     else {
                         if(args.length-1 != i) {
+                            if(args[i+1].charAt(0) != '-'){
                             this.optList.add(new Options(args[i], args[i+1]));
                             indexTracker.add(i+1);
+                            }
+                            else{
+                                System.out.println("Value cannot be "+ args[i+1]);
+                                System.exit(0);
+                            }
                         }
                         else
                             this.optList.add(new Options(args[i]));
