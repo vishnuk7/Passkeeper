@@ -2,10 +2,13 @@ package database;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import token.Token;
 
 import static com.mongodb.client.model.Updates.*;
 import java.util.ArrayList;
@@ -21,13 +24,24 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 
 // user defined data structure
-class userData{
+class userData {
     public String account_id;
     public String account_password;
 
-    userData(String account_id, String account_password){
-        this.account_id=account_id;
-        this.account_password=account_password;
+    userData(String account_id, String account_password) {
+        this.account_id = account_id;
+        this.account_password = account_password;
+    }
+}
+
+class userLogin {
+    public String id;
+    public String user_name;
+    public String user_password;
+
+    userLogin(String user_name, String user_password) {
+        this.user_name = user_name;
+        this.user_password = user_password;
     }
 }
 
@@ -49,7 +63,13 @@ public class Action extends Connection {
 
     // append a new entry to the collections array in document
     public void addNewItem(String accountNmme, String id, String password) {
-        Document filter = new Document("_id", new ObjectId("6016a063454a445efb25b2a3"));
+        Document filter = null;
+        try {
+            filter = new Document("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         collection.updateOne(filter, push("collections",
                 new Document("name", accountNmme).append("account_id", id).append("account_password", password)));
@@ -57,7 +77,7 @@ public class Action extends Connection {
         closeConnection();
     }
 
-    // retrieve data 
+    // retrieve data
     public void view(String accountName) {
         DB db = mongoClient.getDB("passKeeper");
         DBCollection coll = db.getCollection("userData");
@@ -65,8 +85,12 @@ public class Action extends Connection {
         BasicDBObject viewData = new BasicDBObject();
         BasicDBObject field = new BasicDBObject();
 
-        // condition 
-        viewData.put("_id", new ObjectId("6016a063454a445efb25b2a3"));
+        // condition
+        try {
+            viewData.put("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
 
         // fields to retrieve
         field.put("_id", 0);
@@ -85,12 +109,13 @@ public class Action extends Connection {
             // parse retrieved data to JSON array
             try {
                 json = (JSONArray) parser.parse(obj.getString("collections"));
-                for(int i = 0; i < json.size(); i++) {
+                for (int i = 0; i < json.size(); i++) {
                     JSONObject jsonObj = (JSONObject) json.get(i);
 
                     // create an array of objects containing user data
-                    if(jsonObj.get("name").equals(accountName)){
-                        uData.add(new userData(jsonObj.get("account_id").toString(), jsonObj.get("account_password").toString()));
+                    if (jsonObj.get("name").equals(accountName)) {
+                        uData.add(new userData(jsonObj.get("account_id").toString(),
+                                jsonObj.get("account_password").toString()));
                     }
                 }
             } catch (ParseException e) {
@@ -98,28 +123,54 @@ public class Action extends Connection {
             }
         }
 
-        // user selection 
+        // user selection
         System.out.println("Make a selection...");
-        int count=1;
-        for(userData ud:uData){
-            System.out.println(count+". "+ud.account_id);
+        int count = 1;
+        for (userData ud : uData) {
+            System.out.println(count + ". " + ud.account_id);
             count++;
         }
 
-        Scanner scanner=new Scanner(System.in);
-        int ch=scanner.nextInt();
+        Scanner scanner = new Scanner(System.in);
+        int ch = scanner.nextInt();
         scanner.close();
 
         // copy selected entry to clicpboard
-        if(ch>0 && ch <= uData.size()){
+        if (ch > 0 && ch <= uData.size()) {
             Toolkit toolkit = Toolkit.getDefaultToolkit();
-		    Clipboard clipboard = toolkit.getSystemClipboard();
-		    StringSelection strSel = new StringSelection(uData.get(ch-1).account_password);
-		    clipboard.setContents(strSel, null);
+            Clipboard clipboard = toolkit.getSystemClipboard();
+            StringSelection strSel = new StringSelection(uData.get(ch - 1).account_password);
+            clipboard.setContents(strSel, null);
             System.out.println("Copied to clipboard!!✅");
-        }
-        else{
+        } else {
             System.out.println("Incorrect selection!!🤐");
+        }
+    }
+
+    // login function
+    public void login(String username, String password) {
+        DB db = mongoClient.getDB("passKeeper");
+        DBCollection coll = db.getCollection("userData");
+
+        BasicDBObject viewData = new BasicDBObject();
+        BasicDBObject field = new BasicDBObject();
+
+        // condition
+        field.put("user_name", 1);
+        field.put("_id", 1);
+        field.put("user_password", 1);
+
+        DBCursor cursor = coll.find(viewData, field);
+        while (cursor.hasNext()) {
+            BasicDBObject obj = (BasicDBObject) cursor.next();
+
+            if (username.equals(obj.getString("user_name")) && password.equals(obj.getString("user_password"))) {
+                try {
+                    new Token().generate(obj.getString("_id"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

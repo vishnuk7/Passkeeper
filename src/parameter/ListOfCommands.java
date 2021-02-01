@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+
 import database.Action;
 
 public class ListOfCommands {
@@ -17,6 +19,7 @@ public class ListOfCommands {
         invokeOperation.put("create", () -> createUser());
         invokeOperation.put("add", () -> addNewItem());
         invokeOperation.put("list", () -> list());
+        invokeOperation.put("login", () -> login());
     }
 
     public void check(List<String> args, List<Options> optList) {
@@ -34,7 +37,7 @@ public class ListOfCommands {
                 tmpOptions[0] = op;
 
             if (op.flag.equals("-p") && op.value != null)
-                tmpOptions[1]=  op;
+                tmpOptions[1] = op;
         }
 
         if (tmpOptions[0] == null && tmpOptions[1] == null) {
@@ -58,10 +61,10 @@ public class ListOfCommands {
                 tmpOptions[0] = op;
 
             if (op.flag.equals("-id") && op.value != null)
-                tmpOptions[1]=  op;
-            
+                tmpOptions[1] = op;
+
             if (op.flag.equals("-p") && op.value != null)
-                tmpOptions[2]=  op;
+                tmpOptions[2] = op;
         }
 
         if (tmpOptions[0] == null && tmpOptions[1] == null && tmpOptions[2] == null) {
@@ -76,8 +79,7 @@ public class ListOfCommands {
         } else if (tmpOptions[2] == null) {
             System.out.println("Account password is missing");
             return;
-        }
-         else {
+        } else {
             new Action().addNewItem(tmpOptions[0].value, tmpOptions[1].value, tmpOptions[2].value);
         }
     }
@@ -92,8 +94,31 @@ public class ListOfCommands {
         if (tmpOptions[0] == null) {
             System.out.println("Account name is missing!!");
             return;
-        } else {
+        } else
             new Action().view(tmpOptions[0].value);
+    }
+
+    public void login() {
+        // passkeeper login -u <user_name> -p <password>
+        Options[] tmpOptions = { null, null };
+        for (Options op : this.optList) {
+            if (op.flag.equals("-u") && op.value != null)
+                tmpOptions[0] = op;
+            if (op.flag.equals("-p") && op.value != null)
+                tmpOptions[1] = op;
+        }
+
+        if (tmpOptions[0] == null && tmpOptions[1] == null) {
+            System.out.println("Please enter username and password!!");
+            return;
+        } else if (tmpOptions[0] == null) {
+            System.out.println("Please enter username!!");
+            return;
+        } else if (tmpOptions[1] == null) {
+            System.out.println("Please enter password!!");
+            return;
+        } else {
+            new Action().login(tmpOptions[0].value, tmpOptions[1].value);
         }
     }
 }
