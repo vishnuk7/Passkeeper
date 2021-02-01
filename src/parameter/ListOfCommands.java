@@ -92,8 +92,7 @@ public class ListOfCommands {
         }
 
         if (tmpOptions[0] == null) {
-            System.out.println("Account name is missing!!");
-            return;
+            new Action().listAll();
         } else
             new Action().view(tmpOptions[0].value);
     }
