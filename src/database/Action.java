@@ -27,10 +27,17 @@ import com.mongodb.DBCursor;
 class userData {
     public String account_id;
     public String account_password;
+    public String app_name;
 
     userData(String account_id, String account_password) {
         this.account_id = account_id;
         this.account_password = account_password;
+    }
+
+    userData(String account_id, String account_password, String app_name) {
+        this.account_id = account_id;
+        this.account_password = account_password;
+        this.app_name = app_name;
     }
 }
 
@@ -144,6 +151,56 @@ public class Action extends Connection {
             System.out.println("Copied to clipboard!!✅");
         } else {
             System.out.println("Incorrect selection!!🤐");
+        }
+    }
+
+    public void listAll() {
+        DB db = mongoClient.getDB("passKeeper");
+        DBCollection coll = db.getCollection("userData");
+
+        BasicDBObject viewData = new BasicDBObject();
+        BasicDBObject field = new BasicDBObject();
+
+        // condition
+        try {
+            viewData.put("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+
+        // fields to retrieve
+        field.put("_id", 0);
+        field.put("collections", 1);
+
+        List<userData> uData = new ArrayList<userData>();
+
+        DBCursor cursor = coll.find(viewData, field);
+
+        // loop through retrieved data
+        while (cursor.hasNext()) {
+            BasicDBObject obj = (BasicDBObject) cursor.next();
+            JSONParser parser = new JSONParser();
+            JSONArray json;
+
+            // parse retrieved data to JSON array
+            try {
+                json = (JSONArray) parser.parse(obj.getString("collections"));
+                for (int i = 0; i < json.size(); i++) {
+                    JSONObject jsonObj = (JSONObject) json.get(i);
+                    uData.add(new userData(jsonObj.get("account_id").toString(),
+                            jsonObj.get("account_password").toString(), jsonObj.get("name").toString()));
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            int count = 1;
+            System.out.println("Here's list 👇");
+            for (userData ud : uData) {
+                System.out.println(count + ". " + ud.app_name + " - " + ud.account_id);
+                count++;
+            }
+
         }
     }
 

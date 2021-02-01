@@ -9,7 +9,7 @@ public class App {
         ParserArgs parserArgs = new ParserArgs(args);
         List<Options> optList = parserArgs.getOptList();
         List<String> argsList = parserArgs.getArgsList();
-        
+
         listOfCommands.check(argsList, optList);
     }
 }
