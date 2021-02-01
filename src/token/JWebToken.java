@@ -17,10 +17,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- *
- * @author user
- */
 public class JWebToken {
 
     private static final String SECRET_KEY = "FREE_MASON"; //@TODO Add Signature here
