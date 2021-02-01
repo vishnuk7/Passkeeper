@@ -99,7 +99,7 @@ public class ListOfCommands {
             new Action().listOutAccount(tmpOptions[0].value);
         else if (listAll)
             new Action().listAll();
-        else if (tmpOptions[0] == null && tmpOptions[1] == null){
+        else if (tmpOptions[0] == null && tmpOptions[1] == null) {
             System.out.println("invalid flag");
             return;
         } else
@@ -130,28 +130,63 @@ public class ListOfCommands {
         }
     }
 
-    public void delete(){
+    public void delete() {
         Options[] tmpOptions = { null, null };
         boolean isList = false;
         for (Options op : this.optList) {
             if (op.flag.equals("-an") && op.value != null)
                 tmpOptions[0] = op;
-            if(op.flag.equals("-id") && op.value != null)
+            if (op.flag.equals("-id") && op.value != null)
                 tmpOptions[1] = op;
-            if(op.flag.equals("-l"))
-                isList=true;
+            if (op.flag.equals("-l"))
+                isList = true;
         }
 
-        if(tmpOptions[0] == null){
+        if (tmpOptions[0] == null) {
             System.out.println("Account name is missing!!");
             return;
-        } else if(tmpOptions[0] != null && tmpOptions[1] != null){
+        } else if (tmpOptions[0] != null && tmpOptions[1] != null) {
             new Action().deleteOne(tmpOptions[0].value, tmpOptions[1].value);
-        } else if(isList && tmpOptions[0] != null) {
+        } else if (isList && tmpOptions[0] != null) {
             new Action().deleteSelection(tmpOptions[0].value);
-        } else{
+        } else {
             new Action().deleteAll(tmpOptions[0].value);
         }
     }
-}
 
+    // update details when account id is known
+    // passkeeper update -an <app_name> -id <acoount_id> -cp <password> -np
+    // <new_password>
+    public void update() {
+        Options[] tmpOptions = { null, null, null, null };
+        for (Options op : this.optList) {
+            if (op.flag.equals("-an") && op.value != null)
+                tmpOptions[0] = op;
+            if (op.flag.equals("-id") && op.value != null)
+                tmpOptions[1] = op;
+            if (op.flag.equals("-cp") && op.value != null)
+                tmpOptions[2] = op;
+            if (op.flag.equals("-np") && op.value != null)
+                tmpOptions[3] = op;
+        }
+
+        if (tmpOptions[0] != null && tmpOptions[1] == null && tmpOptions[2] == null && tmpOptions[3] == null)
+            new Action().interactiveUpdate(tmpOptions[0].value);
+        if (tmpOptions[0] != null && tmpOptions[1] != null && tmpOptions[2] == null && tmpOptions[3] == null)
+            new Action().updateOneId(tmpOptions[0].value, tmpOptions[1].value);
+        if (tmpOptions[0] == null && tmpOptions[1] == null && tmpOptions[2] == null && tmpOptions[3] == null) {
+            System.out.println("Please enter app name, account id, current password and new password");
+            return;
+        } else if (tmpOptions[1] == null && tmpOptions[2] == null && tmpOptions[3] == null) {
+            System.out.println("Please enter account id, current password and new password");
+            return;
+        } else if (tmpOptions[2] == null && tmpOptions[3] == null) {
+            System.out.println("Please enter account id, current password and new password");
+            return;
+        } else if (tmpOptions[3] == null) {
+            System.out.println("Plase enter a new passsword");
+            return;
+        } else
+            new Action().update(tmpOptions[0].value, tmpOptions[1].value, tmpOptions[2].value, tmpOptions[3].value);
+    }
+}
