@@ -308,8 +308,8 @@ public class Action extends Connection {
         closeConnection();
     }
 
-    public void deleteOne(String accountName, String id){
-        Document filter=null;
+    public void deleteOne(String accountName, String id) {
+        Document filter = null;
         try {
             filter = new Document("_id", new ObjectId(new Token().getId()));
         } catch (JSONException e) {
@@ -317,11 +317,11 @@ public class Action extends Connection {
         }
         Document whereQuery = new Document().append("name", accountName).append("account_id", id);
         collection.updateOne(filter, pull("collections", whereQuery));
-        System.out.println("👍👍"); 
+        System.out.println("👍👍");
         closeConnection();
     }
 
-    public void deleteSelection(String accountName){
+    public void deleteSelection(String accountName) {
         DB db = mongoClient.getDB("passKeeper");
         DBCollection coll = db.getCollection("userData");
 
@@ -376,7 +376,7 @@ public class Action extends Connection {
         int ch = scanner.nextInt();
         scanner.close();
 
-        String strSel = uData.get(ch-1).account_id;
+        String strSel = uData.get(ch - 1).account_id;
 
         Document filter = null;
         try {
@@ -388,5 +388,133 @@ public class Action extends Connection {
         collection.updateOne(filter, pull("collections", whereQuery));
         System.out.println("👍👍");
         closeConnection();
+    }
+
+    // update
+    public void update(String appName, String accountId, String currentPassword, String newPassword) {
+        Document filter = null;
+        try {
+            filter = new Document("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Document whereQuery = new Document().append("name", appName).append("account_id", accountId)
+                .append("account_password", currentPassword);
+        System.out.println(whereQuery);
+        collection.updateOne(filter, pull("collections", whereQuery));
+        collection.updateOne(filter, push("collections",
+                new Document("name", appName).append("account_id", accountId).append("account_password", newPassword)));
+
+        System.out.println("👍👍");
+        closeConnection();
+    }
+
+    public void interactiveUpdate(String appName) {
+        DB db = mongoClient.getDB("passKeeper");
+        DBCollection coll = db.getCollection("userData");
+
+        BasicDBObject viewData = new BasicDBObject();
+        BasicDBObject field = new BasicDBObject();
+
+        // condition
+        try {
+            viewData.put("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+
+        // fields to retrieve
+        field.put("_id", 0);
+        field.put("collections", 1);
+
+        List<userData> uData = new ArrayList<userData>();
+
+        DBCursor cursor = coll.find(viewData, field);
+
+        // loop through retrieved data
+        while (cursor.hasNext()) {
+            BasicDBObject obj = (BasicDBObject) cursor.next();
+            JSONParser parser = new JSONParser();
+            JSONArray json;
+
+            // parse retrieved data to JSON array
+            try {
+                json = (JSONArray) parser.parse(obj.getString("collections"));
+                for (int i = 0; i < json.size(); i++) {
+                    JSONObject jsonObj = (JSONObject) json.get(i);
+
+                    // create an array of objects containing user data
+                    if (jsonObj.get("name").equals(appName)) {
+                        uData.add(new userData(jsonObj.get("account_id").toString(),
+                                jsonObj.get("account_password").toString()));
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("Make a selection... (account to delete)");
+        int count = 1;
+        for (userData ud : uData) {
+            System.out.println(count + ". " + ud.account_id);
+            count++;
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        int ch = Integer.parseInt(scanner.nextLine());
+        System.out.println("Enter your current password");
+        String currentPassword = scanner.nextLine();
+        System.out.println("Enter your new password");
+        String newPassword = scanner.nextLine();
+        scanner.close();
+
+        Document filter = null;
+        try {
+            filter = new Document("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Document whereQuery = new Document().append("name", appName).append("account_id", uData.get(ch - 1).account_id)
+                .append("account_password", currentPassword);
+        collection.updateOne(filter, pull("collections", whereQuery));
+        collection.updateOne(filter, push("collections", new Document("name", appName)
+                .append("account_id", uData.get(ch - 1).account_id).append("account_password", newPassword)));
+
+        System.out.println("👍👍");
+        closeConnection();
+
+        scanner.close();
+
+    }
+
+    public void updateOneId(String appName, String accountId) {
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your current password");
+        String currentPassword = scanner.nextLine();
+        System.out.println("Enter your new password");
+        String newPassword = scanner.nextLine();
+        scanner.close();
+
+        Document filter = null;
+        try {
+            filter = new Document("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Document whereQuery = new Document().append("name", appName).append("account_id", accountId)
+                .append("account_password", currentPassword);
+        collection.updateOne(filter, pull("collections", whereQuery));
+        collection.updateOne(filter, push("collections",
+                new Document("name", appName).append("account_id", accountId).append("account_password", newPassword)));
+
+        System.out.println("👍👍");
+        closeConnection();
+
+        scanner.close();
     }
 }
