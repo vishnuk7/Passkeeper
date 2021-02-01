@@ -18,6 +18,7 @@ public class ListOfCommands {
         invokeOperation.put("add", () -> addNewItem());
         invokeOperation.put("list", () -> list());
         invokeOperation.put("login", () -> login());
+        invokeOperation.put("delete", () -> delete());
     }
 
     public void check(List<String> args, List<Options> optList) {
@@ -98,9 +99,10 @@ public class ListOfCommands {
             new Action().listOutAccount(tmpOptions[0].value);
         else if (listAll)
             new Action().listAll();
-        else if (tmpOptions[0] == null && tmpOptions[1] == null)
+        else if (tmpOptions[0] == null && tmpOptions[1] == null){
             System.out.println("invalid flag");
-        else
+            return;
+        } else
             new Action().list(tmpOptions[0].value);
     }
 
@@ -127,4 +129,29 @@ public class ListOfCommands {
             new Action().login(tmpOptions[0].value, tmpOptions[1].value);
         }
     }
+
+    public void delete(){
+        Options[] tmpOptions = { null, null };
+        boolean isList = false;
+        for (Options op : this.optList) {
+            if (op.flag.equals("-an") && op.value != null)
+                tmpOptions[0] = op;
+            if(op.flag.equals("-id") && op.value != null)
+                tmpOptions[1] = op;
+            if(op.flag.equals("-l"))
+                isList=true;
+        }
+
+        if(tmpOptions[0] == null){
+            System.out.println("Account name is missing!!");
+            return;
+        } else if(tmpOptions[0] != null && tmpOptions[1] != null){
+            new Action().deleteOne(tmpOptions[0].value, tmpOptions[1].value);
+        } else if(isList && tmpOptions[0] != null) {
+            new Action().deleteSelection(tmpOptions[0].value);
+        } else{
+            new Action().deleteAll(tmpOptions[0].value);
+        }
+    }
 }
+
