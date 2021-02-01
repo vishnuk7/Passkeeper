@@ -18,6 +18,7 @@ public class ListOfCommands {
         invokeOperation.put("add", () -> addNewItem());
         invokeOperation.put("list", () -> list());
         invokeOperation.put("login", () -> login());
+        invokeOperation.put("delete", () -> delete());
     }
 
     public void check(List<String> args, List<Options> optList) {
@@ -97,7 +98,7 @@ public class ListOfCommands {
         else if (tmpOptions[0] == null) {
             System.out.println("invalid flag");
         } else
-            new Action().view(tmpOptions[0].value);
+            new Action().list(tmpOptions[0].value);
     }
 
     public void login() {
@@ -123,4 +124,19 @@ public class ListOfCommands {
             new Action().login(tmpOptions[0].value, tmpOptions[1].value);
         }
     }
+
+    public void delete(){
+        Options[] tmpOptions = { null };
+        for (Options op : this.optList) {
+            if (op.flag.equals("-an") && op.value != null)
+                tmpOptions[0] = op;
+        }
+
+        if(tmpOptions[0] == null)
+            System.out.println("Account name is missing!!");
+        else{
+            new Action().delete(tmpOptions[0].value);
+        }
+    }
 }
+

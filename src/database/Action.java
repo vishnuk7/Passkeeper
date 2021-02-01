@@ -74,7 +74,6 @@ public class Action extends Connection {
         try {
             filter = new Document("_id", new ObjectId(new Token().getId()));
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -85,7 +84,7 @@ public class Action extends Connection {
     }
 
     // retrieve data
-    public void view(String accountName) {
+    public void list(String accountName) {
         DB db = mongoClient.getDB("passKeeper");
         DBCollection coll = db.getCollection("userData");
 
@@ -240,5 +239,15 @@ public class Action extends Connection {
                 }
             }
         }
+    }
+
+    public void delete(String appName){
+        Document filter = null;
+        // filter = new Document("_id", new ObjectId(new Token().getId()));
+        filter = new Document("_id", new ObjectId("6016a063454a445efb25b2a3"));
+
+        collection.updateOne(filter, pull("collections", new Document("name", appName)));
+        System.out.println("👍👍");
+        closeConnection();
     }
 }
