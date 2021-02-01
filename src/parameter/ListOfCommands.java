@@ -97,6 +97,7 @@ public class ListOfCommands {
             new Action().listAll();
         else if (tmpOptions[0] == null) {
             System.out.println("invalid flag");
+            return;
         } else
             new Action().list(tmpOptions[0].value);
     }
@@ -126,17 +127,31 @@ public class ListOfCommands {
     }
 
     public void delete(){
-        Options[] tmpOptions = { null };
+        Options[] tmpOptions = { null, null };
         for (Options op : this.optList) {
             if (op.flag.equals("-an") && op.value != null)
                 tmpOptions[0] = op;
+            if(op.flag.equals("-id") && op.value != null)
+                tmpOptions[1] = op;
         }
 
-        if(tmpOptions[0] == null)
+        if(tmpOptions[0] == null){
             System.out.println("Account name is missing!!");
-        else{
-            new Action().delete(tmpOptions[0].value);
+            return;
+        } else if(tmpOptions[0] != null && tmpOptions[1] != null){
+            new Action().deleteOne(tmpOptions[0].value, tmpOptions[1].value);
+        } else{
+            new Action().deleteAll(tmpOptions[0].value);
         }
+
+
+
+
+
+        
+        
+        
+        
     }
 }
 

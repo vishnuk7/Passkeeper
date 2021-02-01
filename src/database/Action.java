@@ -22,6 +22,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 // user defined data structure
 class userData {
@@ -241,12 +242,29 @@ public class Action extends Connection {
         }
     }
 
-    public void delete(String appName){
+    public void deleteAll(String accountName){
         Document filter = null;
-        // filter = new Document("_id", new ObjectId(new Token().getId()));
-        filter = new Document("_id", new ObjectId("6016a063454a445efb25b2a3"));
+        try {
+            filter = new Document("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // filter = new Document("_id", new ObjectId("6016a063454a445efb25b2a3"));
+        collection.updateOne(filter, pull("collections", new Document("name", accountName)));
+        System.out.println("👍👍");
+        closeConnection();
+    }
 
-        collection.updateOne(filter, pull("collections", new Document("name", appName)));
+    public void deleteOne(String accountName, String id){
+        Document filter=null;
+        try {
+            filter = new Document("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // Document filter = new Document("_id", new ObjectId("6016a063454a445efb25b2a3"));
+        Document whereQuery = new Document().append("name", accountName).append("account_id", id);
+        collection.updateOne(filter, pull("collections", whereQuery));
         System.out.println("👍👍");
         closeConnection();
     }
