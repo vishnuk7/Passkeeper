@@ -6,12 +6,9 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-
 
 public class Token {
     public JSONObject jwtPayload = new JSONObject();
@@ -20,7 +17,7 @@ public class Token {
     public Token() throws JSONException {
     }
 
-    public void generate(String id){
+    public void generate(String id) {
         this.id = id;
         final int EXPIRY_DAYS = 2;
 
@@ -68,19 +65,15 @@ public class Token {
 
     }
 
-    
-
     public String getId() {
-        String token ="";
-        try{
+        String token = "";
+        try {
             JSONTokener obj = new JSONTokener(new FileReader("isLogin.json"));
             token = new JSONObject(obj).getString("token");
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }
-        
-    
-        System.out.println(token); 
+
 
         JWebToken incomingToken;
         try {
@@ -93,7 +86,6 @@ public class Token {
         }
 
         return token;
-    } 
-        
-    
+    }
+
 }

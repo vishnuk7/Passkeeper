@@ -85,7 +85,7 @@ public class Action extends Connection {
     }
 
     // retrieve data
-    public void view(String accountName) {
+    public void list(String accountName) {
         DB db = mongoClient.getDB("passKeeper");
         DBCollection coll = db.getCollection("userData");
 
@@ -215,6 +215,59 @@ public class Action extends Connection {
         }
     }
 
+    // passkeeper -an <app_name> -l
+    public void listOutAccount(String appName) {
+        DB db = mongoClient.getDB("passKeeper");
+        DBCollection coll = db.getCollection("userData");
+
+        BasicDBObject viewData = new BasicDBObject();
+        BasicDBObject field = new BasicDBObject();
+
+        // condition
+        try {
+            viewData.put("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+
+        // fields to retrieve
+        field.put("_id", 0);
+        field.put("collections", 1);
+
+        List<userData> uData = new ArrayList<userData>();
+
+        DBCursor cursor = coll.find(viewData, field);
+
+        // loop through retrieved data
+        while (cursor.hasNext()) {
+            BasicDBObject obj = (BasicDBObject) cursor.next();
+            JSONParser parser = new JSONParser();
+            JSONArray json;
+
+            // parse retrieved data to JSON array
+            try {
+                json = (JSONArray) parser.parse(obj.getString("collections"));
+                for (int i = 0; i < json.size(); i++) {
+                    JSONObject jsonObj = (JSONObject) json.get(i);
+                    uData.add(new userData(jsonObj.get("account_id").toString(),
+                            jsonObj.get("account_password").toString(), jsonObj.get("name").toString()));
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            int count = 1;
+            System.out.println("Here's list 👇");
+            System.out.println(appName.toUpperCase());
+            for (userData ud : uData) {
+                if (ud.app_name.equals(appName))
+                    System.out.println(count + ". " + ud.account_id);
+                count++;
+            }
+
+        }
+    }
+
     // login function
     public void login(String username, String password) {
         DB db = mongoClient.getDB("passKeeper");
@@ -241,4 +294,5 @@ public class Action extends Connection {
             }
         }
     }
+
 }
