@@ -86,13 +86,18 @@ public class ListOfCommands {
 
     public void list() {
         Options[] tmpOptions = { null };
+        boolean listAll = false;
         for (Options op : this.optList) {
             if (op.flag.equals("-an") && op.value != null)
                 tmpOptions[0] = op;
+            if (op.flag.equals("-l"))
+                listAll = true;
         }
 
-        if (tmpOptions[0] == null) {
+        if (listAll)
             new Action().listAll();
+        else if (tmpOptions[0] == null) {
+            System.out.println("invalid flag");
         } else
             new Action().view(tmpOptions[0].value);
     }
