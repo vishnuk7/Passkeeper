@@ -128,11 +128,14 @@ public class ListOfCommands {
 
     public void delete(){
         Options[] tmpOptions = { null, null };
+        boolean isList = false;
         for (Options op : this.optList) {
             if (op.flag.equals("-an") && op.value != null)
                 tmpOptions[0] = op;
             if(op.flag.equals("-id") && op.value != null)
                 tmpOptions[1] = op;
+            if(op.flag.equals("-l"))
+                isList=true;
         }
 
         if(tmpOptions[0] == null){
@@ -140,18 +143,11 @@ public class ListOfCommands {
             return;
         } else if(tmpOptions[0] != null && tmpOptions[1] != null){
             new Action().deleteOne(tmpOptions[0].value, tmpOptions[1].value);
+        } else if(isList && tmpOptions[0] != null) {
+            new Action().deleteSelection(tmpOptions[0].value);
         } else{
             new Action().deleteAll(tmpOptions[0].value);
         }
-
-
-
-
-
-        
-        
-        
-        
     }
 }
 

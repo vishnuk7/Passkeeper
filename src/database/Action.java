@@ -22,13 +22,16 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 
 // user defined data structure
 class userData {
     public String account_id;
     public String account_password;
     public String app_name;
+
+    userData(String account_id) {
+        this.account_id = account_id;
+    }
 
     userData(String account_id, String account_password) {
         this.account_id = account_id;
@@ -131,38 +134,36 @@ public class Action extends Connection {
         }
 
         // if there is only one entry then copy it to clipboard by defailt
-        if(uData.size()==1){
+        if (uData.size() == 1) {
             Toolkit toolkit = Toolkit.getDefaultToolkit();
-		    Clipboard clipboard = toolkit.getSystemClipboard();
-		    StringSelection strSel = new StringSelection(uData.get(0).account_password);
-		    clipboard.setContents(strSel, null);
+            Clipboard clipboard = toolkit.getSystemClipboard();
+            StringSelection strSel = new StringSelection(uData.get(0).account_password);
+            clipboard.setContents(strSel, null);
             System.out.println("Copied to clipboard!!✅");
-        }
-        else{
+        } else {
             System.out.println("Make a selection...");
-            int count=1;
-            for(userData ud:uData){
-                System.out.println(count+". "+ud.account_id);
+            int count = 1;
+            for (userData ud : uData) {
+                System.out.println(count + ". " + ud.account_id);
                 count++;
             }
 
-            Scanner scanner=new Scanner(System.in);
-            int ch=scanner.nextInt();
+            Scanner scanner = new Scanner(System.in);
+            int ch = scanner.nextInt();
             scanner.close();
 
             // copy selected entry to clipboard
-            if(ch > 0 && ch <= uData.size()){
+            if (ch > 0 && ch <= uData.size()) {
                 Toolkit toolkit = Toolkit.getDefaultToolkit();
                 Clipboard clipboard = toolkit.getSystemClipboard();
-                StringSelection strSel = new StringSelection(uData.get(ch-1).account_password);
+                StringSelection strSel = new StringSelection(uData.get(ch - 1).account_password);
                 clipboard.setContents(strSel, null);
                 System.out.println("Copied to clipboard!!✅");
-            }
-            else{
+            } else {
                 System.out.println("Incorrect selection!!🤐");
             }
         }
-        
+
     }
 
     public void listAll() {
@@ -242,14 +243,13 @@ public class Action extends Connection {
         }
     }
 
-    public void deleteAll(String accountName){
+    public void deleteAll(String accountName) {
         Document filter = null;
         try {
             filter = new Document("_id", new ObjectId(new Token().getId()));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        // filter = new Document("_id", new ObjectId("6016a063454a445efb25b2a3"));
         collection.updateOne(filter, pull("collections", new Document("name", accountName)));
         System.out.println("👍👍");
         closeConnection();
@@ -262,8 +262,76 @@ public class Action extends Connection {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        // Document filter = new Document("_id", new ObjectId("6016a063454a445efb25b2a3"));
         Document whereQuery = new Document().append("name", accountName).append("account_id", id);
+        collection.updateOne(filter, pull("collections", whereQuery));
+        System.out.println("👍👍"); 
+        closeConnection();
+    }
+
+    public void deleteSelection(String accountName){
+        DB db = mongoClient.getDB("passKeeper");
+        DBCollection coll = db.getCollection("userData");
+
+        BasicDBObject viewData = new BasicDBObject();
+        BasicDBObject field = new BasicDBObject();
+
+        // condition
+        try {
+            viewData.put("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+
+        // fields to retrieve
+        field.put("_id", 0);
+        field.put("collections", 1);
+
+        List<userData> uData = new ArrayList<userData>();
+
+        DBCursor cursor = coll.find(viewData, field);
+
+        // loop through retrieved data
+        while (cursor.hasNext()) {
+            BasicDBObject obj = (BasicDBObject) cursor.next();
+            JSONParser parser = new JSONParser();
+            JSONArray json;
+
+            // parse retrieved data to JSON array
+            try {
+                json = (JSONArray) parser.parse(obj.getString("collections"));
+                for (int i = 0; i < json.size(); i++) {
+                    JSONObject jsonObj = (JSONObject) json.get(i);
+
+                    // create an array of objects containing user data
+                    if (jsonObj.get("name").equals(accountName)) {
+                        uData.add(new userData(jsonObj.get("account_id").toString()));
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("Make a selection...");
+        int count = 1;
+        for (userData ud : uData) {
+            System.out.println(count + ". " + ud.account_id);
+            count++;
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        int ch = scanner.nextInt();
+        scanner.close();
+
+        String strSel = uData.get(ch-1).account_id;
+
+        Document filter = null;
+        try {
+            filter = new Document("_id", new ObjectId(new Token().getId()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Document whereQuery = new Document().append("name", accountName).append("account_id", strSel);
         collection.updateOne(filter, pull("collections", whereQuery));
         System.out.println("👍👍");
         closeConnection();
