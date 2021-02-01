@@ -130,28 +130,39 @@ public class Action extends Connection {
             }
         }
 
-        // user selection
-        System.out.println("Make a selection...");
-        int count = 1;
-        for (userData ud : uData) {
-            System.out.println(count + ". " + ud.account_id);
-            count++;
-        }
-
-        Scanner scanner = new Scanner(System.in);
-        int ch = scanner.nextInt();
-        scanner.close();
-
-        // copy selected entry to clicpboard
-        if (ch > 0 && ch <= uData.size()) {
+        // if there is only one entry then copy it to clipboard by defailt
+        if(uData.size()==1){
             Toolkit toolkit = Toolkit.getDefaultToolkit();
-            Clipboard clipboard = toolkit.getSystemClipboard();
-            StringSelection strSel = new StringSelection(uData.get(ch - 1).account_password);
-            clipboard.setContents(strSel, null);
+		    Clipboard clipboard = toolkit.getSystemClipboard();
+		    StringSelection strSel = new StringSelection(uData.get(0).account_password);
+		    clipboard.setContents(strSel, null);
             System.out.println("Copied to clipboard!!✅");
-        } else {
-            System.out.println("Incorrect selection!!🤐");
         }
+        else{
+            System.out.println("Make a selection...");
+            int count=1;
+            for(userData ud:uData){
+                System.out.println(count+". "+ud.account_id);
+                count++;
+            }
+
+            Scanner scanner=new Scanner(System.in);
+            int ch=scanner.nextInt();
+            scanner.close();
+
+            // copy selected entry to clipboard
+            if(ch > 0 && ch <= uData.size()){
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                Clipboard clipboard = toolkit.getSystemClipboard();
+                StringSelection strSel = new StringSelection(uData.get(ch-1).account_password);
+                clipboard.setContents(strSel, null);
+                System.out.println("Copied to clipboard!!✅");
+            }
+            else{
+                System.out.println("Incorrect selection!!🤐");
+            }
+        }
+        
     }
 
     public void listAll() {
